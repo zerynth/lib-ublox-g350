@@ -1,0 +1,4 @@
+#UBlox
+    ##SARA-G350
+        GSM_HTTP
+
