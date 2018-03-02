@@ -35,7 +35,7 @@ def auto_init():
     Raise :samp:`UnsupportedError` otherwise.
     """
     if __defined(BOARD, "particle_electron"):
-        init(SERIAL5,D32,D35,D33,D34)
+        init(SERIAL5,D35,D32,D33,D34)
     else:
         raise UnsupportedError
 

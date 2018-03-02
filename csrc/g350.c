@@ -118,18 +118,19 @@ void _gs_done(){
  */
 int _gs_poweron(){
     vhalPinSetMode(gs.poweron,PINMODE_OUTPUT_PUSHPULL);
-    vhalPinSetMode(gs.reset,PINMODE_OUTPUT_PUSHPULL);
-    // vhalPinSetMode(gs.dtr,PINMODE_OUTPUT_PUSHPULL);
-    vhalPinSetMode(gs.dtr,PINMODE_INPUT_PULLNONE);
-    vhalPinSetMode(gs.rts,PINMODE_OUTPUT_PUSHPULL);
-    
     vhalPinWrite(gs.poweron,1);
+
+    vhalPinSetMode(gs.reset,PINMODE_OUTPUT_PUSHPULL);
     vhalPinWrite(gs.reset,1);
-    
+
     vhalSerialInit(gs.serial, 115200, SERIAL_CFG(SERIAL_PARITY_NONE,SERIAL_STOP_ONE, SERIAL_BITS_8,0,0), gs.rx, gs.tx);
 
-    vhalPinWrite(gs.rts,1);
-    // vhalPinWrite(gs.dtr,0);
+    vhalPinSetMode(gs.dtr,PINMODE_OUTPUT_PUSHPULL);
+    vhalPinWrite(gs.dtr,0);
+    
+    vhalPinSetMode(gs.rts,PINMODE_OUTPUT_PUSHPULL);
+    vhalPinWrite(gs.rts,0);
+
     int retries = 0;
 
    for(;retries<20;retries++){
@@ -893,7 +894,7 @@ C_NATIVE(_g350_init){
     int32_t exc;
     
         
-    if (parse_py_args("iiiiii", nargs, args, &serial, &rts, &dtr, &poweron, &reset, &exc) != 6)
+    if (parse_py_args("iiiiii", nargs, args, &serial, &dtr, &rts, &poweron, &reset, &exc) != 6)
         return ERR_TYPE_EXC;
 
     g350exc = exc;
@@ -1645,7 +1646,7 @@ uint8_t* _gs_socket_hex_to_bin(uint8_t *hex, uint8_t *buf, int bytes){
         }
         *buf++=c;
     }
-    return hex;
+    return buf;
 }
 
 uint8_t* _gs_socket_bin_to_hex(uint8_t *buf, uint8_t *hex, int bytes){
@@ -1838,7 +1839,7 @@ C_NATIVE(_g350_socket_send) {
         wrt=0;
         while(wrt<len && err==ERR_OK){
             slot = _gs_acquire_slot(GS_CMD_USOWR,NULL,16,GS_TIMEOUT*10,1);
-            tsnd = MIN(MAX_SOCK_HEX_BUF/2,(len-wrt));
+            tsnd = MIN(MAX_SOCK_HEX_BUF/4,(len-wrt));
             _gs_socket_bin_to_hex(buf+wrt,ssock->txbuf,tsnd);
             _gs_send_at(GS_CMD_USOWR,"=i,i,\"s\"",sock,tsnd,ssock->txbuf,tsnd*2);
             _gs_wait_for_slot();
@@ -1891,7 +1892,7 @@ C_NATIVE(_g350_socket_sendto){
         int tsnd;
         while(wrt<len && err==ERR_OK){
             slot = _gs_acquire_slot(GS_CMD_USOST,NULL,16,GS_TIMEOUT*10,1);
-            tsnd = MIN(MAX_SOCK_HEX_BUF/2,(len-wrt));
+            tsnd = MIN(MAX_SOCK_HEX_BUF/4,(len-wrt));
             _gs_socket_bin_to_hex(buf+wrt,ssock->txbuf,tsnd);
             _gs_send_at(GS_CMD_USOST,"=i,\"s\",i,i,\"s\"",sock,saddr,saddrlen,OAL_GET_NETPORT(addr.port),tsnd,ssock->txbuf,tsnd*2);
             _gs_wait_for_slot();
@@ -1950,7 +1951,7 @@ C_NATIVE(_g350_socket_recv_into){
         rb=0;
         while(rb<len && err==ERR_OK){
             slot = _gs_acquire_slot(GS_CMD_USORD,ssock->rxbuf,MAX_SOCK_HEX_RXBUF,GS_TIMEOUT*10,1);
-            trec = MIN(MAX_SOCK_HEX_BUF/2,(len-rb));
+            trec = MIN(MAX_SOCK_HEX_BUF/4,(len-rb));
             _gs_send_at(GS_CMD_USORD,"=i,i",sock,trec);
             _gs_wait_for_slot();
             if (slot->err) {
@@ -1962,7 +1963,7 @@ C_NATIVE(_g350_socket_recv_into){
                     if(trec){
                         hex = slot->resp;
                         hex+=5+((trec>=10)?1:0); //skip 1 int, 2 commas and another int (possibly two digits) and "
-                        buf=_gs_socket_hex_to_bin(hex,buf,trec);
+                        buf = _gs_socket_hex_to_bin(hex,buf,trec);
                     } else {
                         _gs_release_slot(slot);
                         slot=NULL;
@@ -2027,7 +2028,7 @@ C_NATIVE(_g350_socket_recvfrom_into){
         rb=0;
         while(!rb && err==ERR_OK){
             slot = _gs_acquire_slot(GS_CMD_USORF,ssock->rxbuf,MAX_SOCK_HEX_RXBUF,GS_TIMEOUT*10,1);
-            trec = MIN(MAX_SOCK_HEX_BUF/2,(len-rb));
+            trec = MIN(MAX_SOCK_HEX_BUF/4,(len-rb));
             _gs_send_at(GS_CMD_USORF,"=i,i",sock,trec);
             _gs_wait_for_slot();
             if (slot->err) {
@@ -2048,7 +2049,7 @@ C_NATIVE(_g350_socket_recvfrom_into){
                         hex = _gs_advance_to(hex,slot->eresp,"\"");
                         _gs_parse_number(pstart,hex-1,&port);
                         hex++;
-                        buf=_gs_socket_hex_to_bin(hex,buf,trec);
+                        buf = _gs_socket_hex_to_bin(hex,buf,trec);
                         oaddr = pstring_new(saddrlen-2,saddr+1);
                     } else {
                         _gs_release_slot(slot);
