@@ -137,7 +137,7 @@ int _gs_poweron(){
         printf("Power up sequence %i\n",retries); 
         //poweron
         vhalPinWrite(gs.poweron, 0);
-        vosThSleep(TIME_U(50,MILLIS));  //minimum time 5 ms...let's be abundant :)
+        vosThSleep(TIME_U(100,MILLIS));  //minimum time 5 ms...let's be abundant :)
         vhalPinWrite(gs.poweron, 1);
         
         //reset
@@ -1016,7 +1016,33 @@ int _g350_check_network(){
     return p1;
 }
 
-
+C_NATIVE(_new_check_network){
+    NATIVE_UNWARN();
+    printf("_new_check_network 1\n");
+    
+    GSSlot *slot;
+    int p0,p1,p2;
+    PTuple *tpl = ptuple_new(2,NULL);
+    
+    PTUPLE_SET_ITEM(tpl,0,PSMALLINT_NEW(-1));
+    PTUPLE_SET_ITEM(tpl,1,PSMALLINT_NEW(-1));
+    printf("_new_check_network 2\n");
+    slot = _gs_acquire_slot(GS_CMD_CREG,NULL,64,GS_TIMEOUT*5,1);
+    _gs_send_at(GS_CMD_CREG,"?");
+    _gs_wait_for_slot();
+    printf("_new_check_network 3\n");
+    if(_gs_parse_command_arguments(slot->resp,slot->eresp,"ii",&p0,&p1)!=2) {
+        _gs_release_slot(slot);
+        *res = tpl;
+        return ERR_OK;
+    }
+    _gs_release_slot(slot);
+    printf("_new_check_network 4\n");
+    PTUPLE_SET_ITEM(tpl,0,PSMALLINT_NEW(p0));
+    PTUPLE_SET_ITEM(tpl,1,PSMALLINT_NEW(p1));
+    *res = tpl;
+    return ERR_OK;
+}
 
 /**
  * @brief _g350_detach removes the link with the APN while keeping connected to the GSM network

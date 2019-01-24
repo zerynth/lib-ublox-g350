@@ -79,6 +79,10 @@ def network_info():
 def mobile_info():
     pass
 
+@c_native("_new_check_network",["csrc/g350.c"])
+def check_network():
+    pass
+
 @c_native("_g350_link_info",["csrc/g350.c"])
 def link_info():
     pass
