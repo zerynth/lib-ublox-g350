@@ -57,7 +57,7 @@ try:
             print("Trying to connect...")
             # go get that time!
             # url resolution and http protocol handling are hidden inside the requests module
-            response = requests.get("http://now.httpbin.org/")
+            response = requests.get("http://now.zerynth.com/")
             # let's check the http response status: if different than 200, something went wrong
             print("Http Status:",response.status)
             # if we get here, there has been no exception, exit the loop
