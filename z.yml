@@ -1,0 +1,14 @@
+---
+description: Driver for UBlox g250 and g350 GSM modems
+fullname: lib.ublox.g350
+info:
+    chip_manufacturer: UBlox
+    chip_name: G250/G350
+    name: GSM/GPRS Driver
+    type: Connectivity
+keywords:
+- wireless
+- gsm
+- ublox
+title: UBlox G250/G350 GSM modems
+...
