@@ -105,6 +105,33 @@ def last_error():
     """
     pass
 
+@native_c("_g350_rtc",["csrc/g350.c"])
+def rtc():
+    """
+------------
+Network Time
+------------
+
+The UG96 has an internal Real Time Clock that is automatically synchronized with the Network Time.
+The current time can be retrieved with the following function:
+
+.. function:: rtc()
+
+    Return a tuple of seven elements:
+
+        * current year
+        * current month (1-12)
+        * current day (1-31)
+        * current hour (0-23)
+        * current minute (0-59)
+        * current second (0-59)
+        * current timezone in minutes away from GMT 0
+
+    The returned time is always UTC time with a timezone indication.
+
+    """
+    pass
+
 @c_native("_g350_rssi",["csrc/g350.c"])
 def rssi():
     pass
