@@ -127,46 +127,48 @@ typedef struct _gsm_status{
 
 
 #define GS_CMD_CCID             0
-#define GS_CMD_CGATT            1
-#define GS_CMD_CGED             2
-#define GS_CMD_CGSN             3
-#define GS_CMD_CIEV             4
-#define GS_CMD_CMEE             5
-#define GS_CMD_CMER             6
-#define GS_CMD_COPS             7
-#define GS_CMD_CREG             8
-#define GS_CMD_IPR              9
-#define GS_CMD_UDCONF           10
-#define GS_CMD_UDNSRN           11
-#define GS_CMD_UPSD             12
-#define GS_CMD_UPSDA            13
-#define GS_CMD_UPSND            14
-#define GS_CMD_URAT             15
-#define GS_CMD_USECMNG          16
-#define GS_CMD_USECPRF          17
-#define GS_CMD_USOCL            18
-#define GS_CMD_USOCO            19
-#define GS_CMD_USOCR            20
-#define GS_CMD_USOCTL           21
-#define GS_CMD_USOGO            22
-#define GS_CMD_USOLI            23
-#define GS_CMD_USORD            24
-#define GS_CMD_USORF            25
-#define GS_CMD_USOSEC           26
-#define GS_CMD_USOSO            27
-#define GS_CMD_USOST            28
-#define GS_CMD_USOWR            29
-#define GS_CMD_UUPSDA           30
-#define GS_CMD_UUPSDD           31
-#define GS_CMD_UUSOCL           32
-#define GS_CMD_UUSOLI           33
-#define GS_CMD_UUSORD           34
-#define GS_CMD_UUSORF           35
+#define GS_CMD_CCLK             1
+#define GS_CMD_CGATT            2
+#define GS_CMD_CGED             3
+#define GS_CMD_CGSN             4
+#define GS_CMD_CIEV             5
+#define GS_CMD_CMEE             6
+#define GS_CMD_CMER             7
+#define GS_CMD_COPS             8
+#define GS_CMD_CREG             9
+#define GS_CMD_IPR              10
+#define GS_CMD_UDCONF           11
+#define GS_CMD_UDNSRN           12
+#define GS_CMD_UPSD             13
+#define GS_CMD_UPSDA            14
+#define GS_CMD_UPSND            15
+#define GS_CMD_URAT             16
+#define GS_CMD_USECMNG          17
+#define GS_CMD_USECPRF          18
+#define GS_CMD_USOCL            19
+#define GS_CMD_USOCO            20
+#define GS_CMD_USOCR            21
+#define GS_CMD_USOCTL           22
+#define GS_CMD_USOGO            23
+#define GS_CMD_USOLI            24
+#define GS_CMD_USORD            25
+#define GS_CMD_USORF            26
+#define GS_CMD_USOSEC           27
+#define GS_CMD_USOSO            28
+#define GS_CMD_USOST            29
+#define GS_CMD_USOWR            30
+#define GS_CMD_UUPSDA           31
+#define GS_CMD_UUPSDD           32
+#define GS_CMD_UUSOCL           33
+#define GS_CMD_UUSOLI           34
+#define GS_CMD_UUSORD           35
+#define GS_CMD_UUSORF           36
 #define GS_GET_CMD(cmdid) (&gs_commands[cmdid])
 
 static const GSCmd gs_commands[] = {
 
     DEF_CMD("+CCID",      GS_RES_OK, GS_CMD_NORMAL , GS_CMD_CCID),
+    DEF_CMD("+CCLK",      GS_RES_OK, GS_CMD_NORMAL , GS_CMD_CCLK),
     DEF_CMD("+CGATT",     GS_RES_OK, GS_CMD_NORMAL , GS_CMD_CGATT),
     DEF_CMD("+CGED",      GS_RES_OK, GS_CMD_NORMAL , GS_CMD_CGED),
     DEF_CMD("+CGSN",      GS_RES_NO, GS_CMD_NORMAL , GS_CMD_CGSN),
@@ -204,5 +206,4 @@ static const GSCmd gs_commands[] = {
     DEF_CMD("+UUSORF",    GS_RES_NO, GS_CMD_URC    , GS_CMD_UUSORF),
 
 };
-
 

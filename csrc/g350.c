@@ -1297,7 +1297,63 @@ C_NATIVE(_g350_last_error){
     return ERR_OK;
 }
 
+int _g350_get_rtc(uint8_t* time)
+{
+    GSSlot* slot;
+    uint8_t* s0;
+    int l0;
+    int res;
+    slot = _gs_acquire_slot(GS_CMD_CCLK, NULL, 32, GS_TIMEOUT, 1);
+    _gs_send_at(GS_CMD_CCLK, "?");
+    _gs_wait_for_slot();
+    res = !slot->err;
+    if (res) {
+        if (_gs_parse_command_arguments(slot->resp, slot->eresp, "s", &s0, &l0) != 1) {
+            res = 0;
+        } else {
+            memcpy(time, s0 + 1, 20);
+        }
+    }
+    _gs_release_slot(slot);
 
+    return res;
+}
+
+/**
+ * @brief _g350_get_clock reads the real-time clock of the MT by means of +CCLK
+ *
+ *
+ */
+C_NATIVE(_g350_rtc){
+    C_NATIVE_UNWARN();
+    int err = ERR_OK;
+    uint8_t time[20];
+    *res = MAKE_NONE();
+    memset(time,0,20);
+    RELEASE_GIL();
+    if(!_g350_get_rtc(time)) err=ERR_RUNTIME_EXC;
+    ACQUIRE_GIL();
+    if (err==ERR_OK) {
+        PTuple* tpl = ptuple_new(7,NULL);
+        int yy,MM,dd,hh,mm,ss,tz;
+        yy = 2000+((time[0]-'0')*10+(time[1]-'0'));
+        MM = (time[3]-'0')*10+(time[4]-'0');
+        dd = (time[6]-'0')*10+(time[7]-'0');
+        hh = (time[9]-'0')*10+(time[10]-'0');
+        mm = (time[12]-'0')*10+(time[13]-'0');
+        ss = (time[15]-'0')*10+(time[16]-'0');
+        tz = ((time[18]-'0')*10+(time[19]-'0'))*15*((time[17]=='-')?-1:1);
+        PTUPLE_SET_ITEM(tpl,0,PSMALLINT_NEW(yy));
+        PTUPLE_SET_ITEM(tpl,1,PSMALLINT_NEW(MM));
+        PTUPLE_SET_ITEM(tpl,2,PSMALLINT_NEW(dd));
+        PTUPLE_SET_ITEM(tpl,3,PSMALLINT_NEW(hh));
+        PTUPLE_SET_ITEM(tpl,4,PSMALLINT_NEW(mm));
+        PTUPLE_SET_ITEM(tpl,5,PSMALLINT_NEW(ss));
+        PTUPLE_SET_ITEM(tpl,6,PSMALLINT_NEW(tz));
+        *res = tpl;
+    }
+    return err;
+}
 
 /**
  * @brief _g350_rssi return the signal strength as reported by +CIEV urc
@@ -2508,4 +2564,3 @@ C_NATIVE(_g350_resolve){
 
 
 /////////////////////SMS HANDLING
-
